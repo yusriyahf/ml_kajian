@@ -1,5 +1,8 @@
 numpy
 scikit-learn
 tensorflow
-keras
 deepface
+mtcnn
+pillow
+fastapi
+uvicorn
