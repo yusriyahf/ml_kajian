@@ -32,7 +32,7 @@ def predict_gender(image_path, target_size = (64, 64)):
     
     if prediction > 0.5:
         print("This is a male")
-        return "male"
+        return "Laki-laki"
     else:
         print( "This  is a female")
-        return "female"
+        return "Perempuan"
