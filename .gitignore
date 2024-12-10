@@ -1,3 +1,7 @@
 __pycache__
 tmp
+
 dataset/
+
+embeddings.pkl
+
