@@ -30,15 +30,19 @@ def save_embedding(name, embedding, file_path="embeddings.pkl"):
     data[name] = embedding
     with open(file_path, "wb") as f:
         pickle.dump(data, f)
-    print(f"Embedding {name} berhasil disimpan.")
+    
+    print(f"Embedding for {name} saved successfully.")
 
 def load_embeddings(file_path="embeddings.pkl"):
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Tidak ditemukan file embedding di {file_path}")
+        raise FileNotFoundError(f"Embedding file not found at {file_path}")
     
     with open(file_path, "rb") as f:
         data = pickle.load(f)
+    
+    print(f"Loaded embeddings: {list(data.keys())}")  # Log nama-nama yang terdaftar
     return data
+
 
 def compare_embeddings(embedding1, embedding2):
     embedding1 = embedding1.reshape(1, -1)
@@ -71,40 +75,48 @@ def extract_face(filename, required_size=(160, 160)):
 def register_face(name, image_path):
     face_array = extract_face(image_path)
     if face_array is None:
+        print(f"No face detected in image: {image_path}")
         return "No face detected"
     
     temp_image_path = "temp_face_image.jpg"
     face_image = Image.fromarray(face_array)
     face_image.save(temp_image_path)
-    
+
     embedding = get_embedding(temp_image_path)
+    print(f"Generated embedding for {name}: {embedding[:5]}...")  # Log sebagian embedding untuk memverifikasi
+
     save_embedding(name, embedding)
+
     # Remove the temporary file
     os.remove(temp_image_path)
-    
+
 def recognize_face(image_path, embeddings, threshold=0.5):
     face_array = extract_face(image_path)
     if face_array is None:
+        print(f"No face detected in image: {image_path}")
         return "No face detected"
     
     temp_image_path = "temp_face_image.jpg"
     face_image = Image.fromarray(face_array)
     face_image.save(temp_image_path)
-    
+
     # Get embedding from the temporary file
     embedding = get_embedding(temp_image_path)
-    
+    print(f"Generated embedding for prediction: {embedding[:5]}...")  # Log sebagian embedding untuk memverifikasi
+
     # Remove the temporary file
     os.remove(temp_image_path)
-    
+
     max_similarity = -1
     recognized_name = None
     for name, registered_embedding in embeddings.items():
         similarity = compare_embeddings(embedding, registered_embedding)
+        print(f"Comparing {name}: similarity = {similarity}")  # Log perbandingan similarity
+
         if similarity > max_similarity:
             max_similarity = similarity
             recognized_name = name
-    
+
     if max_similarity < threshold:
         return "Unknown"
     return recognized_name
